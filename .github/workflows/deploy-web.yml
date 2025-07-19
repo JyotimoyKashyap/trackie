@@ -36,6 +36,12 @@ jobs:
   deploy:
     needs: build # This job runs only after the 'build' job succeeds
     runs-on: ubuntu-latest
+
+    # Add this environment block
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
