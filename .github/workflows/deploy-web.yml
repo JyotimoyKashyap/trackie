@@ -4,6 +4,9 @@ on:
   push:
     branches: [ "main" ] # Trigger the workflow on push to the main branch
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest # Use a standard Linux runner
