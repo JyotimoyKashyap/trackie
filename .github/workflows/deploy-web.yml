@@ -24,6 +24,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Prepare for Production Build
+        run: cp composeApp/src/jsMain/resources/index.prod.html composeApp/src/jsMain/resources/index.html
+
       - name: Build Web App
         run: ./gradlew clean :composeApp:wasmJsBrowserDistribution
 
@@ -33,16 +36,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./composeApp/build/dist/wasmJs/productionExecutable
           publish_branch: gh-pages # Explicitly push to gh-pages
-
-  # This job takes the content from gh-pages and deploys it
-  deploy:
-    if: github.ref == 'refs/heads/gh-pages' # Only run this job for pushes to gh-pages
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
