@@ -6,6 +6,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import com.jyotimoykashyap.trackie.models.TimeEntry
 import com.jyotimoykashyap.trackie.repository.DefaultTimeLogRepositoryImpl
+import com.jyotimoykashyap.trackie.util.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -48,6 +49,7 @@ class TimerViewModel {
     fun loadLogEntries() {
         // Load entries and reverse them to show the newest first
         _logEntries.value = repository.readAllEntries().reversed()
+        Logger.log("All entries loaded")
     }
 
     fun toggleTimer() {
