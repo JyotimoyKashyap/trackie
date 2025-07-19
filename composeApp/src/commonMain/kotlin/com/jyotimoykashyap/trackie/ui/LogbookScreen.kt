@@ -1,6 +1,4 @@
-@file:OptIn(ExperimentalTime::class)
-
-package com.jyotimoykashyap.trackie
+package com.jyotimoykashyap.trackie.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,25 +19,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.jyotimoykashyap.trackie.models.TimeEntry
-import java.time.format.DateTimeFormatter
-import java.time.ZoneId
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-// Helper function to format the Instant to a readable date/time string
-fun formatInstant(instant: Instant): String {
-    val formatter = DateTimeFormatter.ofPattern("E, dd MMM yyyy 'at' HH:mm")
-        .withZone(ZoneId.systemDefault())
-    return formatter.format(java.time.Instant.ofEpochSecond(instant.epochSeconds))
+@OptIn(ExperimentalTime::class)
+private fun formatInstant(instant: Instant): String {
+    // 1. Convert kotlin.time.Instant to kotlinx.datetime.Instant
+    val kotlinxInstant = Instant.fromEpochSeconds(instant.epochSeconds)
+
+    // 2. Get the current system's timezone
+    val systemTimeZone = TimeZone.currentSystemDefault()
+
+    // 3. Convert the Instant to a local date and time in that timezone
+    val localDateTime = kotlinxInstant.toLocalDateTime(systemTimeZone)
+
+    // 4. Manually build the formatted string
+    val dayOfWeek = localDateTime.dayOfWeek.name.take(3).lowercase().replaceFirstChar { it.titlecase() }
+    val dayOfMonth = localDateTime.day.toString().padStart(2, '0')
+    val month = localDateTime.month.name.take(3).lowercase().replaceFirstChar { it.titlecase() }
+    val year = localDateTime.year
+    val hour = localDateTime.hour.toString().padStart(2, '0')
+    val minute = localDateTime.minute.toString().padStart(2, '0')
+
+    return "$dayOfWeek, $dayOfMonth $month $year at $hour:$minute"
 }
 
 // A new Composable for displaying a single log entry
+@OptIn(ExperimentalTime::class)
 @Composable
 fun LogEntryItem(entry: TimeEntry) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
-        elevation = 4.dp
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(

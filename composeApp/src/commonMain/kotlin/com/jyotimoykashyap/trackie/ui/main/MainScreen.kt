@@ -1,17 +1,28 @@
-package com.jyotimoykashyap.trackie
+package com.jyotimoykashyap.trackie.ui.main
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.jyotimoykashyap.trackie.ui.LogbookScreen
+import com.jyotimoykashyap.trackie.ui.TimerScreen
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun DesktopApp(viewModel: TimerViewModel) {
+fun MainScreen(viewModel: TimerViewModel) {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Timer", "Logbook")
 
-    MaterialTheme(colors = darkColors()) {
+    MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             Column {
                 TabRow(selectedTabIndex = selectedTab) {
@@ -38,5 +49,5 @@ fun DesktopApp(viewModel: TimerViewModel) {
 @Composable
 @Preview
 fun AppPreview() {
-    DesktopApp(TimerViewModel())
+    MainScreen(TimerViewModel())
 }

@@ -1,10 +1,18 @@
-package com.jyotimoykashyap.trackie
+package com.jyotimoykashyap.trackie.ui.main
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import com.jyotimoykashyap.trackie.models.TimeEntry
-import kotlinx.coroutines.*
+import com.jyotimoykashyap.trackie.repository.DefaultTimeLogRepositoryImpl
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -12,7 +20,7 @@ import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 class TimerViewModel {
-    private val repository = TimeLogRepository()
+    private val repository = DefaultTimeLogRepositoryImpl()
     private var timerJob: Job? = null
     private val viewModelScope = CoroutineScope(Dispatchers.Default)
 
@@ -54,7 +62,7 @@ class TimerViewModel {
         _isRunning.value = true
         startTime = Clock.System.now()
         timerJob = viewModelScope.launch {
-            while (isActive) {
+            while (currentCoroutineContext().isActive) {
                 _elapsedTime.value = (Clock.System.now() - (startTime ?: Clock.System.now())).inWholeSeconds
                 delay(1000)
             }
@@ -88,7 +96,10 @@ class TimerViewModel {
     private fun formatTime(seconds: Long): String {
         val duration = seconds.seconds
         return duration.toComponents { hours, minutes, secs, _ ->
-            String.format("%02d:%02d:%02d", hours, minutes, secs)
+            val formattedHours = hours.toString().padStart(2, '0')
+            val formattedMinutes = minutes.toString().padStart(2, '0')
+            val formattedSeconds = secs.toString().padStart(2, '0')
+            "$formattedHours:$formattedMinutes:$formattedSeconds"
         }
     }
 }
