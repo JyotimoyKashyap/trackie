@@ -25,7 +25,7 @@ jobs:
           java-version: '17'
 
       - name: Prepare for Production Build
-        run: cp composeApp/src/jsMain/resources/index.prod.html composeApp/src/jsMain/resources/index.html
+        run: cp composeApp/src/wasmJsMain/resources/index.prod.html composeApp/src/wasmJsMain/resources/index.html
 
       - name: Build Web App
         run: ./gradlew clean :composeApp:wasmJsBrowserDistribution
