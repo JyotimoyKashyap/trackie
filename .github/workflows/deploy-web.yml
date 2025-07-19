@@ -28,3 +28,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./composeApp/build/dist/js/productionExecutable # Directory with the web files
+          keep_files: false
