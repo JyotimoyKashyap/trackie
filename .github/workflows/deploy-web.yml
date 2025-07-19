@@ -1,18 +1,18 @@
-name: Deploy Web to GitHub Pages
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "gh-pages" ] # Trigger on pushes to EITHER branch
 
-# Grant permissions for deployment
 permissions:
-  contents: read
+  contents: write # Needed for the build job to push to gh-pages
   pages: write
   id-token: write
 
 jobs:
-  # Job 1: Build the web app and upload it as an artifact
+  # This job builds the app and pushes it to the gh-pages branch
   build:
+    if: github.ref == 'refs/heads/main' # Only run this job for pushes to main
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,21 +27,21 @@ jobs:
       - name: Build Web App
         run: ./gradlew clean :composeApp:wasmJsBrowserDistribution
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: ./composeApp/build/dist/wasmJs/productionExecutable/
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./composeApp/build/dist/wasmJs/productionExecutable
+          publish_branch: gh-pages # Explicitly push to gh-pages
 
-  # Job 2: Deploy the artifact to GitHub Pages
+  # This job takes the content from gh-pages and deploys it
   deploy:
-    needs: build # This job runs only after the 'build' job succeeds
+    if: github.ref == 'refs/heads/gh-pages' # Only run this job for pushes to gh-pages
+    needs: build
     runs-on: ubuntu-latest
-
-    # Add this environment block
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
