@@ -18,7 +18,7 @@ jobs:
           java-version: '17'
 
       - name: Build Web App
-        run: ./gradlew :composeApp:jsBrowserDistribution # Step 3: Build the static web files
+        run: ./gradlew :composeApp:wasmJsBrowserDistribution # Step 3: Build the static web files
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3 # Step 4: Deploy the built files
