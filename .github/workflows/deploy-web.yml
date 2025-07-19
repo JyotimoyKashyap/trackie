@@ -2,30 +2,41 @@ name: Deploy Web to GitHub Pages
 
 on:
   push:
-    branches: [ "main" ] # Trigger the workflow on push to the main branch
+    branches: [ "main" ]
 
+# Grant permissions for deployment
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest # Use a standard Linux runner
+  # Job 1: Build the web app and upload it as an artifact
+  build:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # Step 1: Get your code from the repo
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4 # Step 2: Set up Java for Gradle
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: Build Web App
-        run: ./gradlew clean :composeApp:wasmJsBrowserDistribution # Step 3: Build the static web files
+        run: ./gradlew clean :composeApp:wasmJsBrowserDistribution
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3 # Step 4: Deploy the built files
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./composeApp/build/dist/js/productionExecutable # Directory with the web files
-          keep_files: false
+          path: ./composeApp/build/dist/wasmJs/productionExecutable/
+
+  # Job 2: Deploy the artifact to GitHub Pages
+  deploy:
+    needs: build # This job runs only after the 'build' job succeeds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
